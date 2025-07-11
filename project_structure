@@ -1,0 +1,19 @@
+sql-executor/
+├── cmd/
+│   └── main.go
+├── config/
+│   └── config.go
+├── internal/
+│   ├── database/
+│   │   ├── database.go
+│   │   ├── mysql.go
+│   │   ├── oracle.go
+│   │   └── postgres.go
+│   ├── executor/
+│   │   └── executor.go
+│   └── output/
+│       └── writer.go
+├── pkg/
+│   └── logger/
+│       └── logger.go
+└── config.yaml 
