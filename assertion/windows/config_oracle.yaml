@@ -1,0 +1,23 @@
+database:
+  type: "oracle"  # mysql, oracle, pgsql
+  username: "root"
+  password: "123456"
+  
+  # MySQL DSN 示例
+  # dsn: "{username}:{password}@tcp(localhost:3306)/test"
+  
+  # Oracle DSN 示例（使用 SID）
+  # dsn: "oracle://{username}:{password}@host:1521/dbname?sid=sid"
+  # Oracle DSN 示例（使用 Service Name）
+  # dsn: "oracle://{username}:{password}@host:1521/service_name"
+  
+  # PostgreSQL DSN 示例
+  # dsn: "postgres://{username}:{password}@localhost:5432/dbname?sslmode=disable"
+  
+  dsn: "oracle://{username}:{password}@192.168.24.116:1521/xe"
+
+output:
+  directory: "./output"
+  format: "csv"
+  show_in_console: true
+  save_to_file: true
