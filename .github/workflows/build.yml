@@ -34,7 +34,7 @@ jobs:
           if [ "$GOOS" = "windows" ]; then
             ext=".exe"
           fi
-          go build -v -o build/sqlexecutor-${GOOS}-${GOARCH}${ext} .
+          go build -v -o build/sqlexecutor-${GOOS}-${GOARCH}${ext} ./cmd
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
