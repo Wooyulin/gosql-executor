@@ -35,6 +35,7 @@ jobs:
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
           VERSION: ${{ steps.get_version.outputs.version }}
         run: |
           mkdir -p dist
