@@ -2,3 +2,4 @@ PRD.md
 *.exe
 config.yaml
 output/*
+assertion/*
