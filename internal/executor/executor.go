@@ -1,14 +1,15 @@
 package executor
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+	"io"
 	"sql-executor/internal/database"
 	"sql-executor/internal/output"
 	"sql-executor/pkg/logger"
 	"strings"
 	"time"
+
+	"github.com/peterh/liner"
 )
 
 type SQLExecutor struct {
@@ -26,22 +27,40 @@ func NewSQLExecutor(db database.Database, writer output.Writer, logger *logger.L
 }
 
 func (e *SQLExecutor) Run() error {
-	scanner := bufio.NewScanner(os.Stdin)
+	state := liner.NewLiner()
+	defer state.Close()
+
+	state.SetCtrlCAborts(false) // Ctrl+C 仅取消当前输入，不退出程序
 
 	for {
-		fmt.Print("SQL> ")
 		var query string
-		for scanner.Scan() {
-			line := scanner.Text()
+		for {
+			prompt := "SQL> "
+			if query != "" {
+				prompt = "  -> "
+			}
+			line, err := state.Prompt(prompt)
+			if err != nil {
+				if err == io.EOF {
+					return nil
+				}
+				e.logger.Error("读取输入失败", err)
+				query = ""
+				break
+			}
+
 			if line == "exit" {
 				return nil
 			}
 
 			query += line + " "
-			if line == "" || line[len(line)-1] == ';' {
+			query = strings.TrimSpace(query)
+			if query == "" {
+				continue
+			}
+			if line == "" || strings.HasSuffix(strings.TrimSpace(line), ";") {
 				break
 			}
-			fmt.Print("  -> ")
 		}
 
 		if query = strings.TrimSpace(query); query == "" {
@@ -70,6 +89,9 @@ func (e *SQLExecutor) Run() error {
 		} else {
 			e.logger.Info(fmt.Sprintf("查询执行完成，耗时: %v", duration))
 		}
+
+		// 将执行过的 SQL 加入历史，方便上下键回顾
+		state.AppendHistory(query)
 		fmt.Println()
 	}
 }
