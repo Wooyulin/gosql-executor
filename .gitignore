@@ -3,3 +3,4 @@ PRD.md
 config.yaml
 output/*
 assertion/*
+target/*
