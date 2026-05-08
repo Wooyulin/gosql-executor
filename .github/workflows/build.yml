@@ -50,8 +50,8 @@ jobs:
           # 构建带版本名的二进制
           GOOS=$GOOS GOARCH=$GOARCH go build -o "$filename" ./cmd
 
-          # 打包 zip
-          zip -j "dist/$zipname" "$filename"
+          # 打包 zip（附带配置模板）
+          zip -j "dist/$zipname" "$filename" config.yaml.example
 
       - name: Upload release artifacts
         uses: softprops/action-gh-release@v2
