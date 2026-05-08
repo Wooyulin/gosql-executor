@@ -48,6 +48,6 @@ func NewDatabase(cfg *config.DatabaseConfig) (Database, error) {
 	case "pgsql":
 		return NewPostgresDatabase(cfg), nil
 	default:
-		return nil, fmt.Errorf("不支持的数据库类型: %s", cfg.Type)
+		return nil, fmt.Errorf("unsupported database type: %s", cfg.Type)
 	}
 }

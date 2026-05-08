@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// 允许通过命令行参数指定配置文件路径
-	configPath := flag.String("config", "./config.yaml", "配置文件路径")
+	configPath := flag.String("config", "./config.yaml", "config file path")
 	flag.Parse()
 
 	// 加载配置：文件存在则读取，否则进入交互式配置
@@ -22,16 +22,16 @@ func main() {
 	if _, err := os.Stat(*configPath); os.IsNotExist(err) {
 		cfg, err = config.InteractiveSetup()
 		if err != nil {
-			log.Fatalf("交互式配置失败: %v", err)
+			log.Fatalf("Interactive setup failed: %v", err)
 		}
 		if err := config.SaveConfig(cfg, *configPath); err != nil {
-			log.Fatalf("保存配置文件失败: %v", err)
+			log.Fatalf("Failed to save config: %v", err)
 		}
-		fmt.Printf("\n配置已保存到 %s\n", *configPath)
+		fmt.Printf("\nConfig saved to %s\n", *configPath)
 	} else {
 		cfg, err = config.LoadConfig(*configPath)
 		if err != nil {
-			log.Fatalf("加载配置失败: %v", err)
+			log.Fatalf("Failed to load config: %v", err)
 		}
 	}
 
@@ -41,11 +41,11 @@ func main() {
 	// 初始化数据库连接
 	db, err := database.NewDatabase(&cfg.Database)
 	if err != nil {
-		logger.Fatal("创建数据库连接失败", err)
+		logger.Fatal("Failed to create database connection", err)
 	}
 
 	if err := db.Connect(); err != nil {
-		logger.Fatal("连接数据库失败", err)
+		logger.Fatal("Failed to connect to database", err)
 	}
 	defer db.Close()
 
@@ -57,6 +57,6 @@ func main() {
 
 	// 运行程序
 	if err := executor.Run(); err != nil {
-		logger.Fatal("程序执行失败", err)
+		logger.Fatal("Execution failed", err)
 	}
 }

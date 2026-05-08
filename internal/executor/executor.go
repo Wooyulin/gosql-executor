@@ -44,7 +44,7 @@ func (e *SQLExecutor) Run() error {
 				if err == io.EOF {
 					return nil
 				}
-				e.logger.Error("读取输入失败", err)
+				e.logger.Error("Failed to read input", err)
 				query = ""
 				break
 			}
@@ -72,22 +72,22 @@ func (e *SQLExecutor) Run() error {
 		start := time.Now()
 		rows, err := e.db.Execute(query)
 		if err != nil {
-			e.logger.Error("执行SQL失败", err)
+			e.logger.Error("Failed to execute SQL", err)
 			continue
 		}
 		defer rows.Close()
 
 		filename := fmt.Sprintf("query_result_%d", time.Now().Unix())
 		if err := e.writer.Write(filename, rows); err != nil {
-			e.logger.Error("写入结果失败", err)
+			e.logger.Error("Failed to write results", err)
 			continue
 		}
 
 		duration := time.Since(start)
 		if e.writer.(*output.FileWriter).Config().SaveToFile {
-			e.logger.Info(fmt.Sprintf("查询执行完成，耗时: %v，结果已保存到: %s", duration, filename))
+			e.logger.Info(fmt.Sprintf("Query executed in %v, saved to: %s", duration, filename))
 		} else {
-			e.logger.Info(fmt.Sprintf("查询执行完成，耗时: %v", duration))
+			e.logger.Info(fmt.Sprintf("Query executed in %v", duration))
 		}
 
 		// 将执行过的 SQL 加入历史，方便上下键回顾

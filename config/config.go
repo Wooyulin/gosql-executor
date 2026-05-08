@@ -32,12 +32,12 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.SetConfigFile(configPath)
 
 	if err := v.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("读取配置文件失败: %w", err)
+		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
 	var config Config
 	if err := v.Unmarshal(&config); err != nil {
-		return nil, fmt.Errorf("解析配置文件失败: %w", err)
+		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
 	return &config, nil
@@ -46,10 +46,10 @@ func LoadConfig(configPath string) (*Config, error) {
 func SaveConfig(cfg *Config, path string) error {
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
-		return fmt.Errorf("序列化配置失败: %w", err)
+		return fmt.Errorf("failed to serialize config: %w", err)
 	}
 	if err := os.WriteFile(path, data, 0600); err != nil {
-		return fmt.Errorf("写入配置文件失败: %w", err)
+		return fmt.Errorf("failed to write config file: %w", err)
 	}
 	return nil
 }

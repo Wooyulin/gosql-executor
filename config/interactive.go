@@ -25,10 +25,10 @@ func InteractiveSetup() (*Config, error) {
 	state := liner.NewLiner()
 	defer state.Close()
 
-	fmt.Println("未找到配置文件，进入交互式配置：")
+	fmt.Println("Config file not found. Starting interactive setup:")
 
 	// Database type
-	dbType, err := promptChoice(state, "数据库类型 [mysql/oracle/pgsql]", "", func(v string) bool {
+	dbType, err := promptChoice(state, "Database type [mysql/oracle/pgsql]", "", func(v string) bool {
 		return validTypes[v]
 	})
 	if err != nil {
@@ -36,36 +36,36 @@ func InteractiveSetup() (*Config, error) {
 	}
 
 	// Host
-	host, err := promptWithDefault(state, "主机地址", "127.0.0.1")
+	host, err := promptWithDefault(state, "Host", "127.0.0.1")
 	if err != nil {
 		return nil, err
 	}
 
 	// Port
-	port, err := promptWithDefault(state, "端口", defaultPorts[dbType])
+	port, err := promptWithDefault(state, "Port", defaultPorts[dbType])
 	if err != nil {
 		return nil, err
 	}
 	if _, err := strconv.Atoi(port); err != nil {
-		return nil, fmt.Errorf("端口必须是数字: %s", port)
+		return nil, fmt.Errorf("port must be a number: %s", port)
 	}
 
 	// Username
-	username, err := promptRequired(state, "用户名")
+	username, err := promptRequired(state, "Username")
 	if err != nil {
 		return nil, err
 	}
 
 	// Password (masked)
-	password, err := promptPassword(state, "密码")
+	password, err := promptPassword(state, "Password")
 	if err != nil {
 		return nil, err
 	}
 
 	// Database name / service name
-	dbNameLabel := "数据库名"
+	dbNameLabel := "Database name"
 	if dbType == "oracle" {
-		dbNameLabel = "服务名 (Service Name)"
+		dbNameLabel = "Service name"
 	}
 	dbName, err := promptRequired(state, dbNameLabel)
 	if err != nil {
@@ -129,7 +129,7 @@ func promptRequired(state *liner.State, label string) (string, error) {
 		if val != "" {
 			return val, nil
 		}
-		fmt.Println("该项不能为空，请重新输入")
+		fmt.Println("This field is required")
 	}
 }
 
@@ -146,7 +146,7 @@ func promptChoice(state *liner.State, label, defaultVal string, valid func(strin
 		if valid(val) {
 			return val, nil
 		}
-		fmt.Println("输入无效，请重新选择")
+		fmt.Println("Invalid input, please try again")
 	}
 }
 

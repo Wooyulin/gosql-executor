@@ -36,7 +36,7 @@ func (w *FileWriter) Write(filename string, rows *sql.Rows) error {
 	// 获取列名（在使用前先获取）
 	columns, err := rows.Columns()
 	if err != nil {
-		return fmt.Errorf("获取列名失败: %w", err)
+		return fmt.Errorf("failed to get columns: %w", err)
 	}
 
 	// 准备存放数据的切片
@@ -50,7 +50,7 @@ func (w *FileWriter) Write(filename string, rows *sql.Rows) error {
 	var allRows [][]interface{}
 	for rows.Next() {
 		if err := rows.Scan(valuePtrs...); err != nil {
-			return fmt.Errorf("扫描行数据失败: %w", err)
+			return fmt.Errorf("failed to scan row: %w", err)
 		}
 
 		// 复制当前行的值
@@ -62,13 +62,13 @@ func (w *FileWriter) Write(filename string, rows *sql.Rows) error {
 	}
 
 	if err := rows.Err(); err != nil {
-		return fmt.Errorf("读取行数据失败: %w", err)
+		return fmt.Errorf("failed to read rows: %w", err)
 	}
 
 	// 在命令行显示结果
 	if w.config.ShowInConsole {
 		if err := w.displayInConsole(columns, allRows); err != nil {
-			return fmt.Errorf("显示结果失败: %w", err)
+			return fmt.Errorf("failed to display results: %w", err)
 		}
 	}
 
@@ -79,7 +79,7 @@ func (w *FileWriter) Write(filename string, rows *sql.Rows) error {
 
 	// 写入文件
 	if err := os.MkdirAll(w.config.Directory, 0755); err != nil {
-		return fmt.Errorf("创建输出目录失败: %w", err)
+		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
 	ext := ".csv"
@@ -135,7 +135,7 @@ func (w *FileWriter) displayInConsole(columns []string, rows [][]interface{}) er
 
 	// 如果还有更多行
 	if len(rows) > 100 {
-		fmt.Fprintln(tw, "... 更多行已省略 ...")
+		fmt.Fprintln(tw, "... more rows omitted ...")
 	}
 
 	tw.Flush()
@@ -146,7 +146,7 @@ func (w *FileWriter) displayInConsole(columns []string, rows [][]interface{}) er
 func (w *FileWriter) writeCSV(filepath string, columns []string, rows [][]interface{}) error {
 	file, err := os.Create(filepath)
 	if err != nil {
-		return fmt.Errorf("创建CSV文件失败: %w", err)
+		return fmt.Errorf("failed to create CSV file: %w", err)
 	}
 	defer file.Close()
 
@@ -155,7 +155,7 @@ func (w *FileWriter) writeCSV(filepath string, columns []string, rows [][]interf
 
 	// 写入表头
 	if err := writer.Write(columns); err != nil {
-		return fmt.Errorf("写入CSV表头失败: %w", err)
+		return fmt.Errorf("failed to write CSV header: %w", err)
 	}
 
 	// 写入数据行
@@ -166,7 +166,7 @@ func (w *FileWriter) writeCSV(filepath string, columns []string, rows [][]interf
 		}
 
 		if err := writer.Write(strRow); err != nil {
-			return fmt.Errorf("写入CSV数据行失败: %w", err)
+			return fmt.Errorf("failed to write CSV row: %w", err)
 		}
 
 		// 每 batchSize 行刷新一次缓冲区
@@ -174,7 +174,7 @@ func (w *FileWriter) writeCSV(filepath string, columns []string, rows [][]interf
 			writer.Flush()
 			if fileInfo, err := file.Stat(); err == nil {
 				if fileInfo.Size() > maxFileSize {
-					return fmt.Errorf("文件大小超过限制(1GB)")
+					return fmt.Errorf("file size exceeds 1GB limit")
 				}
 			}
 		}
@@ -186,13 +186,13 @@ func (w *FileWriter) writeCSV(filepath string, columns []string, rows [][]interf
 func (w *FileWriter) writeJSON(filepath string, columns []string, rows [][]interface{}) error {
 	file, err := os.Create(filepath)
 	if err != nil {
-		return fmt.Errorf("创建JSON文件失败: %w", err)
+		return fmt.Errorf("failed to create JSON file: %w", err)
 	}
 	defer file.Close()
 
 	// 写入JSON数组开始标记
 	if _, err := file.WriteString("[\n"); err != nil {
-		return fmt.Errorf("写入JSON头部失败: %w", err)
+		return fmt.Errorf("failed to write JSON header: %w", err)
 	}
 
 	encoder := json.NewEncoder(file)
@@ -209,19 +209,19 @@ func (w *FileWriter) writeJSON(filepath string, columns []string, rows [][]inter
 		// 添加逗号分隔符
 		if i > 0 {
 			if _, err := file.WriteString(",\n"); err != nil {
-				return fmt.Errorf("写入JSON分隔符失败: %w", err)
+				return fmt.Errorf("failed to write JSON separator: %w", err)
 			}
 		}
 
 		if err := encoder.Encode(rowMap); err != nil {
-			return fmt.Errorf("写入JSON数据行失败: %w", err)
+			return fmt.Errorf("failed to write JSON row: %w", err)
 		}
 
 		// 检查文件大小
 		if (i+1)%batchSize == 0 {
 			if fileInfo, err := file.Stat(); err == nil {
 				if fileInfo.Size() > maxFileSize {
-					return fmt.Errorf("文件大小超过限制(1GB)")
+					return fmt.Errorf("file size exceeds 1GB limit")
 				}
 			}
 		}
@@ -229,7 +229,7 @@ func (w *FileWriter) writeJSON(filepath string, columns []string, rows [][]inter
 
 	// 写入JSON数组结束标记
 	if _, err := file.WriteString("\n]"); err != nil {
-		return fmt.Errorf("写入JSON尾部失败: %w", err)
+		return fmt.Errorf("failed to write JSON footer: %w", err)
 	}
 
 	return nil

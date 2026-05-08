@@ -23,7 +23,7 @@ func NewPostgresDatabase(cfg *config.DatabaseConfig) *PostgresDatabase {
 func (p *PostgresDatabase) Connect() error {
 	db, err := sql.Open("postgres", p.BaseDatabase.GetDSN())
 	if err != nil {
-		return fmt.Errorf("连接PostgreSQL数据库失败: %w", err)
+		return fmt.Errorf("failed to connect to PostgreSQL: %w", err)
 	}
 
 	p.BaseDatabase.DB = db

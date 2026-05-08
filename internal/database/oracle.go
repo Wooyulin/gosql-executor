@@ -23,7 +23,7 @@ func NewOracleDatabase(cfg *config.DatabaseConfig) *OracleDatabase {
 func (o *OracleDatabase) Connect() error {
 	db, err := sql.Open("oracle", o.BaseDatabase.GetDSN())
 	if err != nil {
-		return fmt.Errorf("连接Oracle数据库失败: %w", err)
+		return fmt.Errorf("failed to connect to Oracle: %w", err)
 	}
 
 	o.BaseDatabase.DB = db
