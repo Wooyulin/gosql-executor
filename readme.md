@@ -1,5 +1,7 @@
 # SQL Executor
 
+English | [中文](README_CN.md)
+
 A lightweight command-line SQL query tool supporting MySQL, Oracle, and PostgreSQL. Query results can be exported to CSV/JSON files.
 
 ## Features
