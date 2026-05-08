@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"sql-executor/config"
@@ -16,15 +17,22 @@ func main() {
 	configPath := flag.String("config", "./config.yaml", "配置文件路径")
 	flag.Parse()
 
-	// 检查配置文件是否存在
+	// 加载配置：文件存在则读取，否则进入交互式配置
+	var cfg *config.Config
 	if _, err := os.Stat(*configPath); os.IsNotExist(err) {
-		log.Fatalf("配置文件不存在: %s\n请根据 config.yaml.example 创建配置文件", *configPath)
-	}
-
-	// 加载配置
-	cfg, err := config.LoadConfig(*configPath)
-	if err != nil {
-		log.Fatalf("加载配置失败: %v", err)
+		cfg, err = config.InteractiveSetup()
+		if err != nil {
+			log.Fatalf("交互式配置失败: %v", err)
+		}
+		if err := config.SaveConfig(cfg, *configPath); err != nil {
+			log.Fatalf("保存配置文件失败: %v", err)
+		}
+		fmt.Printf("\n配置已保存到 %s\n", *configPath)
+	} else {
+		cfg, err = config.LoadConfig(*configPath)
+		if err != nil {
+			log.Fatalf("加载配置失败: %v", err)
+		}
 	}
 
 	// 初始化日志
